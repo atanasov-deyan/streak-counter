@@ -1,6 +1,6 @@
 {
   "name": "streak-counter",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "This is a basic streak counter - inspired by Duolingo - written in TypeScript and meant for the browser (uses `localStorage`).",
   "main": "index.js",
   "scripts": {
