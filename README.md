@@ -4,9 +4,9 @@ This is a basic streak counter - inspired by Duolingo - written in TypeScript an
 
 ## Install
 
-yarn add @jsjoeio/streak-counter
+yarn add @atanasov-deyan/streak-counter
 
-npm install @jsjoeio/streak-counter
+npm install @atanasov-deyan/streak-counter
 
 ## Usage
 
