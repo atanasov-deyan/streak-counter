@@ -1,26 +1,20 @@
-import { formatDate } from "./utils"
-
-const KEY = 'streak'
-const  INCREMENT = 'INCREMENT'
-const dayInMs = 24 * 60 * 60 * 1000
-
-interface Streak {
-  currentCount: number
-  startDate: string
-  lastLoginDate: string
-}
-
+import { buildStreak, formatDate, Streak, StreakAction, updateStreak } from "./utils"
+import { KEY, INCREMENT, NONE, RESET } from './constants'
 function shouldIncrementOrResetStreakCount(
     currentDate: Date,
     lastLoginDate: string,
-): 'INCREMENT' | undefined {
+): StreakAction {
     const difference = currentDate.getDate() - parseInt(lastLoginDate.split('/')[0])
-    console.log({difference, currentDate, lastLoginDate})
+
+    if (difference === 0) {
+        return NONE
+    }
+
     if (difference === 1) {
         return INCREMENT
     }
 
-    return undefined
+    return RESET
 }
 // used to access and store data in Storage
 export function streakCounter(storage: Storage, date: Date): Streak {
@@ -28,18 +22,27 @@ export function streakCounter(storage: Storage, date: Date): Streak {
 
   if (streakLocalStorage) {
     try {
-        const streak = JSON.parse(streakLocalStorage)
+        const streak = JSON.parse(streakLocalStorage) as Streak
         const state = shouldIncrementOrResetStreakCount(date, streak.lastLoginDate)
         const shouldIncrement = state === INCREMENT
+        const shouldReset = state === RESET
 
         if (shouldIncrement) {
-            const updatedStreak = {
-                  ...streak,
-                  currentCount: streak.currentCount + 1,
-                  lastLoginDate: formatDate(date),
-                }
-
+            const updatedStreak = buildStreak(date, {
+                startDate: streak.startDate,
+                currentCount: streak.currentCount + 1,
+                lastLoginDate: formatDate(date),
+            })
+                // store updated streak in localStorage
+                updateStreak(storage, updatedStreak)
                 return updatedStreak
+        }
+
+        if (shouldReset) {
+            const updatedStreak = buildStreak(date)
+
+            updateStreak(storage, updatedStreak)
+            return updatedStreak
         }
         return streak
     } catch (err) {
@@ -47,12 +50,8 @@ export function streakCounter(storage: Storage, date: Date): Streak {
     }
   }
 
-  const streak = {
-    currentCount: 1,
-    startDate: formatDate(date),
-    lastLoginDate: formatDate(date)
-  }
+  const streak = buildStreak(date)
 
-  storage.setItem(KEY, JSON.stringify(streak))
+  updateStreak(storage, streak)
   return streak
 }

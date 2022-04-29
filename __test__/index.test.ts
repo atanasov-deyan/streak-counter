@@ -83,5 +83,63 @@ describe('streakCounter', () => {
 
         expect(streak.currentCount).toBe(1)
     })
+
+    it('should save the incremented streak to localStorage', () => {
+        const key = 'streak'
+        const date = new Date()
+        // Call it once so it updates the streak
+        streakCounter(mockLocalStorage, date)
+
+        const streakAsString = mockLocalStorage.getItem(key)
+        // Normally you should wrap in try/catch in case the JSON is bad
+        // but since we authored it, we can skip here
+        const streak = JSON.parse(streakAsString || '')
+
+        expect(streak.currentCount).toBe(2)
+    })
+
+    it('should reset if not consecutive', () => {
+        const date = new Date()
+        const streak = streakCounter(mockLocalStorage, date)
+
+        expect(streak.currentCount).toBe(2)
+
+        // Skip a day and break the streak
+        const dateUpdated = new Date((new Date()).getTime() + 48 * 60 * 60 * 1000)
+
+        const streakUpdated = streakCounter(mockLocalStorage, dateUpdated)
+
+        expect(streakUpdated.currentCount).toBe(1)
+    })
+
+    it('should save the reset streak to localStorage', () => {
+        const key = 'streak'
+        const date = new Date()
+        // Call it once so it updates the streak
+        streakCounter(mockLocalStorage, date)
+
+        // Skip a day and break the streak
+        const dateUpdated = new Date((new Date()).getTime() + 48 * 60 * 60 * 1000)
+        const streakUpdated = streakCounter(mockLocalStorage, dateUpdated)
+
+        const streakAsString = mockLocalStorage.getItem(key)
+        // Normally you should wrap in try/catch in case the JSON is bad
+        // but since we authored it, we can skip here
+        const streak = JSON.parse(streakAsString || '')
+
+        expect(streak.currentCount).toBe(1)
+    })
+
+    it('should not reset the streak for same-day login', () => {
+        const date = new Date()
+        // Call it once so it updates the streak
+        streakCounter(mockLocalStorage, date)
+
+        // Simulate same-day login
+        const dateUpdated = new Date()
+        const streakUpdated = streakCounter(mockLocalStorage, dateUpdated)
+
+        expect(streakUpdated.currentCount).toBe(2)
+      })
   })
 })
