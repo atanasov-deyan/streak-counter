@@ -43,7 +43,7 @@ describe('streakCounter', () => {
   describe('with pre-existing streak in localStorage', () => {
     const yesterday = new Date((new Date()).getTime() - 24 * 60 * 60 * 1000)
     beforeEach(() => {
-      const mockJSDom = new JSDOM('', {url: 'https://localhost'})
+      const mockJSDom = new JSDOM('', {url: 'https://localhost' })
 
       mockLocalStorage = mockJSDom.window.localStorage
 
@@ -65,6 +65,23 @@ describe('streakCounter', () => {
       const streak = streakCounter(mockLocalStorage, today)
 
       expect(streak.startDate).toBe(formatDate(yesterday))
+    })
+
+    it('should increment the streak', () => {
+        // It should increment because this is the day after
+        // the streak started and a streak is days in a row.
+        const date = new Date()
+        const streak = streakCounter(mockLocalStorage, date)
+        expect(streak.currentCount).toBe(2)
+    })
+
+    it('should not increment the streak when login days not consecutive', () => {
+        // It should not increment because this is two days after
+        // the streak started and the days aren't consecutive.
+        const tomorrow = new Date((new Date()).getTime() + 24 * 60 * 60 * 1000)
+        const streak = streakCounter(mockLocalStorage, tomorrow)
+
+        expect(streak.currentCount).toBe(1)
     })
   })
 })
