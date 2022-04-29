@@ -41,7 +41,7 @@ describe('streakCounter', () => {
   })
 
   describe('with pre-existing streak in localStorage', () => {
-    const yesterday = new Date((new Date()).getTime() - 24 * 60 * 60 * 1000)
+    const yesterday = new Date((new Date()).getTime() - (24 * 60 * 60 * 1000))
     beforeEach(() => {
       const mockJSDom = new JSDOM('', {url: 'https://localhost' })
 
